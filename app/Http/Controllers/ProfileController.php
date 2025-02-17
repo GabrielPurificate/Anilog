@@ -38,6 +38,35 @@ class ProfileController extends Controller
     }
 
     /**
+     * Update the user's profile photo.
+     */
+    public function updatePhoto(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        $user = $request->user();
+
+        // Deleta a foto antiga, se existir
+        if ($user->photo) {
+            \Storage::disk('public')->delete($user->photo);
+        }
+
+        // Armazena a nova foto
+        if ($request->hasFile('photo')) {
+            $path = $request->file('photo')->store('profile_photos', 'public');
+            $user->photo = $path;
+        } else {
+            $user->photo = null;
+        }
+
+        $user->save();
+
+        return Redirect::route('profile.edit')->with('status', 'photo-updated');
+    }
+
+    /**
      * Delete the user's account.
      */
     public function destroy(Request $request): RedirectResponse

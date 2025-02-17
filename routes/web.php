@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AvaliacaoController;
+use App\Http\Controllers\AnimeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -34,6 +36,16 @@ Route::get('/anime/{id}', function ($id) {
 
     return view('anime.details', compact('anime'));
 })->middleware(['auth', 'verified'])->name('anime.details');
+
+Route::middleware('auth')->group(function () {
+    Route::post('/avaliacoes', [AvaliacaoController::class, 'store']);
+});
+
+Route::put('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.update.photo');
+
+Route::get('/anime/{mal_id}', [AnimeController::class, 'show']);
+
+Route::get('/anime/{mal_id}/avaliacoes', [AvaliacaoController::class, 'listarAvaliacoes']);
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
